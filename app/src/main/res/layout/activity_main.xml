@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".activity.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="15dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dashboard"
+                android:textSize="30dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:layout_marginRight="100dp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnLogout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|right"
+                android:layout_marginRight="5dp"
+                android:background="@color/pink"
+                android:text="Logout" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            >
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add a new Car"
+                android:textColor="@color/black"
+                android:textSize="18dp"/>
+
+<!--            <Spinner-->
+<!--                android:id="@+id/spinner1"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:contentDescription="Select"-->
+<!--                android:popupBackground="@color/white"-->
+<!--                android:background="@android:drawable/btn_dropdown"-->
+<!--                android:spinnerMode="dropdown"-->
+<!--                android:layout_marginBottom="5dp"/>-->
+
+
+<!--            <Spinner-->
+<!--                android:id="@+id/spinner2"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:contentDescription="Select"-->
+<!--                android:popupBackground="@color/white"-->
+<!--                android:background="@android:drawable/btn_dropdown"-->
+<!--                android:spinnerMode="dropdown"-->
+<!--                android:layout_marginBottom="5dp"/>-->
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                android:layout_marginBottom="5dp"
+                >
+                <AutoCompleteTextView
+                    android:id="@+id/autoCompleteTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#c0c0c0"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:inputType="none"
+                    android:text="Select make"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                android:layout_marginBottom="5dp"
+                >
+                <AutoCompleteTextView
+                    android:id="@+id/autoCompleteTV1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#c0c0c0"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:inputType="none"
+                    android:text="Select model"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnAddCar"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginRight="5dp"
+                android:background="@color/teal_200"
+                android:text="Add Car" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_margin="15dp"
+            >
+
+            <TextView
+                android:id="@+id/tvYourCar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your Cars"
+                android:textColor="@color/black"
+                android:textSize="18dp"/>
+            <TextView
+                android:id="@+id/tvOverview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Add cars to see"
+                android:textSize="20dp"
+                android:gravity="center|center_vertical"
+                android:textColor="@color/black"
+                android:visibility="visible"/>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recylerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/base_car_view"
+                    android:visibility="gone"/>
+            </ScrollView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
