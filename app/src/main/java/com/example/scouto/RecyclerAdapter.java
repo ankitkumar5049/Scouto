@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,11 +17,26 @@ import com.example.scouto.model.Car;
 import java.util.ArrayList;
 
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
+public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements View.OnClickListener {
 
     private ArrayList<Car> localDataSet;
+    private onClickListtner mItemListener;
     static DatabaseHelper db;
     private final int GALLERY_REQ_CODE = 1000;
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnAddCarImage:
+                Log.e("TAG", "onClick recycler: ", null);
+                mItemListener.onClick(); // You can send any field or model as a param here.
+                break;
+
+            default:
+                Log.e("TAG", "onClick other: ", null);
+                break;
+        }
+    }
 
     /**
      * Provide a reference to the type of views that you are using
@@ -29,17 +45,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
         private final TextView textView1;
-
-
-
-        private  Button addImg;
-        private  Button deleteCar;
-        private  ImageView imageView;
+        private Button addImg;
+        private Button deleteCar;
+        private ImageView imageView;
 
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
-
             textView = (TextView) view.findViewById(R.id.tvCarMake);
             textView1 = (TextView) view.findViewById(R.id.tvCarId);
             deleteCar = view.findViewById(R.id.btnDeleteCar);
@@ -55,7 +67,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
      * Initialize the dataset of the Adapter
      *
      * @param dataSet String[] containing the data to populate views to be used
-     * by RecyclerView
+     *                by RecyclerView
      */
     public RecyclerAdapter(ArrayList<Car> dataSet) {
         localDataSet = dataSet;
@@ -68,14 +80,21 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.base_car_view, viewGroup, false);
 
-        ViewHolder holder = new ViewHolder(view);
-        holder.addImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
+//        ViewHolder holder = new ViewHolder(view);
+//        holder.addImg.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//            }
+//        });
         return new ViewHolder(view);
+    }
+
+    private OnRecyclerItemClick onRecyclerItemClick;
+
+
+    public void setOnRecyclerItemClick(OnRecyclerItemClick onRecyclerItemClick){
+        this.onRecyclerItemClick = onRecyclerItemClick;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -87,14 +106,22 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         viewHolder.textView.setText(localDataSet.get(position).getMakeName());
         viewHolder.textView1.setText(localDataSet.get(position).getMakeId());
+        viewHolder.addImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (onRecyclerItemClick != null)
+                    onRecyclerItemClick.onClick(viewHolder.getAdapterPosition());
+            }
+        });
         viewHolder.deleteCar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 db = new DatabaseHelper(view.getContext(), "cars", null, 1);
                 localDataSet.remove(viewHolder.getAdapterPosition());
                 long r = db.deleteCarData(viewHolder.textView1.getText().toString());
-                if(r>0) Log.e("TAG", "deleted Successfully: ", null);
-                else Log.e("TAG", " not deleted Successfully: ", null);
+
+                if (r > 0) Toast.makeText(view.getContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show();
+                else Toast.makeText(view.getContext(), "Some error occurred", Toast.LENGTH_SHORT).show();
                 notifyDataSetChanged();
             }
         });

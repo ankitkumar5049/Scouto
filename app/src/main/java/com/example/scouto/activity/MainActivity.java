@@ -1,11 +1,13 @@
 package com.example.scouto.activity;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.scouto.OnRecyclerItemClick;
 import com.example.scouto.R;
 import com.example.scouto.RecyclerAdapter;
 import com.example.scouto.database.DatabaseHelper;
@@ -38,7 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements onClickListtner {
+public class MainActivity extends AppCompatActivity {
 
     RecyclerAdapter recyclerAdapter;
     RecyclerView.LayoutManager layoutManager;
@@ -49,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
     AutoCompleteTextView tv1;
     ArrayList<String> list1;
     ArrayList<Car> listCar;
-    ArrayList<Results> list3;
     ArrayList<String> list2;
     ArrayList<Car> list;
 
@@ -70,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
         listCar = new ArrayList<>();
         list1 = new ArrayList<>();
         list2 = new ArrayList<>();
-        list3 = new ArrayList<>();
 
         db = new DatabaseHelper(MainActivity.this, "cars", null, 1);
         recyclerView = findViewById(R.id.recylerView);
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -103,8 +104,7 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
                 value[0] = adapterView.getItemAtPosition(i).toString();
                 id[0] = Integer.parseInt(map.get(value[0]));
                 api2(id[0]);
-                Log.e("TAG", "onItemSelected2: "+id[0], null);
-//                Toast.makeText(MainActivity.this, value[0],Toast.LENGTH_SHORT).show();
+                Log.e("TAG", "onItemSelected2: " + id[0], null);
             }
         });
 
@@ -116,16 +116,30 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
         tv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                 value1[0] = adapterView.getItemAtPosition(i).toString();
+                value1[0] = adapterView.getItemAtPosition(i).toString();
                 onResume();
             }
         });
 
         layoutManager = new LinearLayoutManager(this);
-        if(list!=null && list.size()>0) {
+        if (list != null && list.size() > 0) {
             tvOverview.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             recyclerAdapter = new RecyclerAdapter(list);
+            recyclerAdapter.setOnRecyclerItemClick(new OnRecyclerItemClick() {
+                @Override
+                public void onClick(int position) {
+                    Log.e("TAG", "onClick: add car image  button" + position, null);
+                    Intent intent = new Intent(Intent.ACTION_PICK);
+                    intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, GALLERY_REQ_CODE);
+                }
+
+                @Override
+                public void onDeleteClick(int position) {
+
+                }
+            });
             recyclerView.setAdapter(recyclerAdapter);
             recyclerView.setLayoutManager(layoutManager);
 
@@ -135,25 +149,24 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
         btnAddCar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(value[0].equals("")|| value[0]==null ||value1[0].equals("")|| value1[0]==null){
-                    Toast.makeText(MainActivity.this, "Select both the fields",Toast.LENGTH_SHORT).show();
-                }else {
+                if (value[0].equals("") || value[0] == null || value1[0].equals("") || value1[0] == null) {
+                    Toast.makeText(MainActivity.this, "Select both the fields", Toast.LENGTH_SHORT).show();
+                } else {
                     long id = db.saveCarData(value[0], value1[0]);
                     if (id > 0) {
                         Toast.makeText(MainActivity.this, "Added Successfully", Toast.LENGTH_SHORT).show();
                         list = db.getRecords();
-                        if(list!=null && list.size()>0) {
+                        if (list != null && list.size() > 0) {
                             tvOverview.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
-                        }
-                        else{
+                        } else {
                             tvOverview.setVisibility(View.VISIBLE);
                             recyclerView.setVisibility(View.GONE);
                         }
                         recyclerAdapter = new RecyclerAdapter(list);
                         recyclerView.setAdapter(recyclerAdapter);
                         recyclerView.setLayoutManager(layoutManager);
-                        recyclerAdapter.notifyItemInserted(list.size()-1);
+                        recyclerAdapter.notifyItemInserted(list.size() - 1);
 
                     } else {
                         Toast.makeText(MainActivity.this, "not added Successfully", Toast.LENGTH_SHORT).show();
@@ -176,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
                 R.layout.item_file, list1);
         adapter.setDropDownViewResource(R.layout.item_file);
         tv.setAdapter(adapter);
-//        recyclerAdapter.notifyDataSetChanged();
     }
 
     public void api(List<Car> listCar) {
@@ -195,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
                         try {
                             object = new JSONObject(response.toString());
                             JSONArray array = object.getJSONArray("Results");
-                            for(int i=0;i<array.length();i++){
+                            for (int i = 0; i < array.length(); i++) {
                                 JSONObject jo = array.getJSONObject(i);
                                 String makeId = jo.getString("Make_ID");
                                 String makeName = jo.getString("Make_Name");
@@ -212,8 +224,7 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error)
-                    {
+                    public void onErrorResponse(VolleyError error) {
                         Log.e("TAG", "onResponse: error", null);
                     }
                 });
@@ -224,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
 
     public void api2(int id) {
         list2.clear();
-        String url = "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeId/"+id+"?format=json";
+        String url = "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeId/" + id + "?format=json";
 
         RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
 
@@ -240,11 +251,11 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
                         try {
                             object = new JSONObject(response.toString());
                             JSONArray array = object.getJSONArray("Results");
-                            for(int i=0;i<array.length();i++){
+                            for (int i = 0; i < array.length(); i++) {
                                 JSONObject jo = array.getJSONObject(i);
-                                String makeId = jo.getString("Make_ID");
-                                String makeName = jo.getString("Make_Name");
-                                String modelId = jo.getString("Model_ID");
+//                                String makeId = jo.getString("Make_ID");
+//                                String makeName = jo.getString("Make_Name");
+//                                String modelId = jo.getString("Model_ID");
                                 String modelName = jo.getString("Model_Name");
                                 list2.add(modelName);
                             }
@@ -257,8 +268,7 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error)
-                    {
+                    public void onErrorResponse(VolleyError error) {
                         Log.e("TAG", "onResponse: error", null);
                     }
                 });
@@ -268,20 +278,12 @@ public class MainActivity extends AppCompatActivity implements onClickListtner {
     }
 
     @Override
-    public void onClick(int position, String button_pressed) {
-        Log.e("TAG", "img button pressed", null);
-//        Intent intent = new Intent(Intent.ACTION_PICK);
-//        intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        startActivityForResult(intent, GALLERY_REQ_CODE);
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == GALLERY_REQ_CODE) {
+                carImage.setImageURI(data.getData());
+            }
+        }
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if(resultCode==RESULT_OK){
-//            if(requestCode==GALLERY_REQ_CODE){
-//                carImage.setImageURI(data.getData());
-//            }
-//        }
-//    }
 }
